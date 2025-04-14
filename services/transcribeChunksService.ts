@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { transcribeAudio } from "./transcribeSerivce"; // ajuste o caminho se necessário
+import { transcribeAudio } from "./transcribeSerivce";
 
 export const transcribeChunks = async (chunkDir: string): Promise<string> => {
   try {

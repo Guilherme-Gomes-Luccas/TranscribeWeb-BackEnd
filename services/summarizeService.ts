@@ -46,10 +46,10 @@ export const summarizeText = async (text: string): Promise<string> => {
   }
 };
 
-// Função que divide o texto em partes menores (com base em um número de palavras)
+// Dividir grande texto em pequenas partes
 function splitText(text: string): string[] {
   const words = text.split(/\s+/);
-  const maxWordsPerChunk = 250; // Uma boa média que não vai sobrecarregar o modelo
+  const maxWordsPerChunk = 250;
 
   const chunks: string[] = [];
   let currentChunk = "";

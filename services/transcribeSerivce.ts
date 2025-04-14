@@ -44,7 +44,7 @@ export const transcribeAudio = async (filePath: string): Promise<string> => {
     console.error("Erro na transcrição:", err);
     return "Erro na transcrição";
   } finally {
-    // Remove o áudio temporário
+    // Remover o áudio
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }
