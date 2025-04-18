@@ -1,21 +1,46 @@
 import { Request, Response } from "express";
-import { transcribeAudio } from "../services/transcribeSerivce";
-import { summarizeText } from "../services/summarizeService";
+import axios from "axios";
+import fs from "fs";
+import path from "path";
+import FormData from "form-data";
 
-export const handleUploadAndProcess = async (req: Request, res: Response): Promise<void> => {
+const UPLOAD_DIR = path.resolve("uploads");
+
+export const uploadAudio = async (req: Request, res: Response): Promise<void> => {
   try {
-    const filePath = req.file?.path;
-    if (!filePath) {
-      res.status(400).json({ error: "Arquivo não encontrado" });
+    fs.readdirSync(UPLOAD_DIR).forEach((file) => {
+        fs.unlinkSync(path.join(UPLOAD_DIR, file));
+    });
+
+    if (!req.file) {
+      res.status(400).json({ error: "Nenhum arquivo enviado" });
       return;
     }
 
-    const transcript = await transcribeAudio(filePath);
-    const summary = await summarizeText(transcript);
+    const filePath = path.resolve(req.file.path);
+    console.log("→ Iniciando upload para FastAPI. Arquivo em:", filePath);
 
-    res.json({ transcript, summary });
-  } catch (error) {
-    console.error("Erro:", error);
-    res.status(500).json({ error: "Erro no processamento" });
+    const formData = new FormData();
+    formData.append("file", fs.createReadStream(filePath), req.file.originalname);
+    console.log("→ FormData headers:", formData.getHeaders());
+
+    interface TranscribeResponse {
+      resumo: string;
+      transcricao: string;
+    }
+
+    const response = await axios.post<TranscribeResponse>(
+      "https://GuilhermeGomes-TranscribeWebAPI.hf.space/transcribe/",
+      formData,
+      { headers: formData.getHeaders(), maxContentLength: Infinity } as any
+    ); 
+
+    console.log("← Resposta da FastAPI:", response.status, response.data);
+    fs.unlinkSync(filePath);
+    res.json({ summary: response.data.resumo, transcript: response.data.transcricao });
+
+  } catch (error: any) {
+    console.error("❌ Erro no uploadAudio:", error.stack || error);
+    res.status(500).json({ error: "Erro ao processar o áudio" });
   }
 };
