@@ -13,17 +13,12 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 
 export const uploadAudio = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Limpa arquivos antigos da pasta
-    fs.readdirSync(UPLOAD_DIR).forEach((file) => {
-      fs.unlinkSync(path.join(UPLOAD_DIR, file));
-    });
-
     if (!req.file) {
       res.status(400).json({ error: "Nenhum arquivo enviado" });
       return;
     }
 
-    const filePath = path.resolve(req.file.path);
+    const filePath = path.resolve(req.file.path); // <-- Arquivo recém-uploadado
     console.log("→ Iniciando upload para FastAPI. Arquivo em:", filePath);
 
     const formData = new FormData();
@@ -43,7 +38,7 @@ export const uploadAudio = async (req: Request, res: Response): Promise<void> =>
 
     console.log("← Resposta da FastAPI:", response.status, response.data);
 
-    // Só apaga o arquivo depois do upload bem-sucedido
+    // Agora sim: remove o arquivo atual depois de usá-lo
     fs.unlinkSync(filePath);
 
     res.json({ summary: response.data.resumo, transcript: response.data.transcricao });
