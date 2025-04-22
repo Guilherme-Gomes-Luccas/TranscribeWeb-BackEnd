@@ -4,9 +4,9 @@ import fs from "fs";
 import path from "path";
 import FormData from "form-data";
 
-const UPLOAD_DIR = path.resolve("uploads");
+const UPLOAD_DIR = "/tmp/uploads";
 
-// Garante que a pasta uploads exista
+// Garante que a pasta exista (boa prática mesmo com multer criando automaticamente)
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
@@ -42,7 +42,10 @@ export const uploadAudio = async (req: Request, res: Response): Promise<void> =>
     );
 
     console.log("← Resposta da FastAPI:", response.status, response.data);
+
+    // Só apaga o arquivo depois do upload bem-sucedido
     fs.unlinkSync(filePath);
+
     res.json({ summary: response.data.resumo, transcript: response.data.transcricao });
 
   } catch (error: any) {
