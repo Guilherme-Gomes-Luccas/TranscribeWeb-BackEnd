@@ -6,10 +6,16 @@ import FormData from "form-data";
 
 const UPLOAD_DIR = path.resolve("uploads");
 
+// Garante que a pasta uploads exista
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
 export const uploadAudio = async (req: Request, res: Response): Promise<void> => {
   try {
+    // Limpa arquivos antigos da pasta
     fs.readdirSync(UPLOAD_DIR).forEach((file) => {
-        fs.unlinkSync(path.join(UPLOAD_DIR, file));
+      fs.unlinkSync(path.join(UPLOAD_DIR, file));
     });
 
     if (!req.file) {
@@ -33,7 +39,7 @@ export const uploadAudio = async (req: Request, res: Response): Promise<void> =>
       "https://GuilhermeGomes-TranscribeWebAPI.hf.space/transcribe/",
       formData,
       { headers: formData.getHeaders(), maxContentLength: Infinity } as any
-    ); 
+    );
 
     console.log("← Resposta da FastAPI:", response.status, response.data);
     fs.unlinkSync(filePath);
