@@ -17,5 +17,3 @@ API utilizada consiste em um código em python hospedado no HuggingFace Spaces
 
 # 🖥️ Onde acessar o projeto
 <a href="https://transcribewebfrontend.vercel.app/">CLique aqui para visualizar o projeto</a>
-
-![Transcribe Web](images/TranscribeWeb.png)
